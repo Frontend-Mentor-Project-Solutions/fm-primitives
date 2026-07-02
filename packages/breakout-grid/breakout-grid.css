@@ -1,0 +1,58 @@
+/* Inspired by Kevin Powell's complex breakout layout 
+/* and Andrew Walpole's breakouts generator
+/* https://codepen.io/kevinpowell/pen/YzMyeJy
+/* https://layout-breakouts-builder.vercel.app/
+*/
+
+.breakout-grid {
+  /* ---------------------------------------------------------------- */
+  /* Public API — set these to configure the grid. Widths must be     */
+  /* ascending: content-width < popout-width < breakout-width.        */
+  /* ---------------------------------------------------------------- */
+  --padding-inline: 1rem;
+  --content-width: 65ch;
+  --popout-width: 1000px;
+  --breakout-width: 1400px;
+
+  /* Internal — derived values, not meant to be set directly.*/
+  --_popout-gutter: max(
+    0px,
+    calc((var(--popout-width) - var(--content-width)) / 2)
+  );
+  --_breakout-gutter: max(
+    0px,
+    calc((var(--breakout-width) - var(--popout-width)) / 2)
+  );
+  --_content-half: min(50% - var(--padding-inline), var(--content-width) / 2);
+
+  display: grid;
+  grid-template-columns:
+    [full-width-start] minmax(var(--padding-inline), 1fr)
+    [breakout-start] minmax(0, var(--_breakout-gutter))
+    [popout-start] minmax(0, var(--_popout-gutter))
+    [content-start] var(--_content-half)
+    [center-line] var(--_content-half)
+    [content-end] minmax(0, var(--_popout-gutter))
+    [popout-end] minmax(0, var(--_breakout-gutter))
+    [breakout-end] minmax(var(--padding-inline), 1fr)
+    [full-width-end];
+}
+
+:is(.breakout-grid, .full-width) > * {
+  grid-column: content;
+}
+
+:is(.breakout-grid, .full-width) > .popout {
+  grid-column: popout;
+}
+
+:is(.breakout-grid, .full-width) > .breakout {
+  grid-column: breakout;
+}
+
+:is(.breakout-grid, .full-width) > .full-width {
+  grid-column: full-width;
+  /* let full-width children re-use the same tier system for their own children */
+  display: grid;
+  grid-template-columns: inherit;
+}
